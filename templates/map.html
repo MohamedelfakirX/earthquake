@@ -1,0 +1,69 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Earthquake Relief Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <h1>Earthquake Relief Map</h1>
+    <div id="map" style="height: 500px;"></div>
+
+    <script>
+        var map = L.map('map').setView([YOUR_LATITUDE, YOUR_LONGITUDE], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Create markers for earthquake-affected areas
+        var marker = L.marker([MARKER_LATITUDE, MARKER_LONGITUDE]).addTo(map);
+        marker.bindPopup("Marker Description");
+
+        // Add more markers as needed
+    </script>
+</body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Earthquake Relief Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <h1>Earthquake Relief Map</h1>
+    <div id="map" style="height: 500px;"></div>
+
+    {{ map_html|safe }}
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</body>
+</html>
+ -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title style="text-align: right;">خريطة إغاثة الزلزال</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+</head>
+<body>
+    <h1 style="text-align: right;">خريطة إغاثة الزلزال</h1>
+    <div id="map" style="height: 500px;"></div>
+
+    {% if message %}
+    <div class="error-message">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    {{ map_html|safe }}
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</body>
+</html>
+

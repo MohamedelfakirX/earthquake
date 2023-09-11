@@ -1,0 +1,12 @@
+/* Your CSS styles for the web pages go here */
+body {
+    font-family: Arial, sans-serif;
+}
+
+form {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+/* Add your custom styling */
