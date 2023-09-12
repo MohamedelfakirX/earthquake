@@ -61,21 +61,28 @@ def map():
     try:
         # Load data from the Excel file
         df = pd.read_excel('earthquake_relief.xlsx')
+        df_location = pd.read_excel('locations.xlsx')
 
         # Create a Folium map centered at an initial location
-        m = folium.Map(location=[df['latitude'].mean(), df['longitude'].mean()], zoom_start=5)
+        m = folium.Map(location=[df_location['latitude'].quantile(0.7), df_location['longitude'].quantile(0.7)], zoom_start=5)
 
         # Create a MarkerCluster layer
         marker_cluster = MarkerCluster(disable_clustering_at_zoom=5,max_cluster_radius=15).add_to(m)  # Adjust the zoom level as needed
 
         # Add markers for each location with counts and popup information
-        for index, row in df.iterrows():
-            count = row['Count']
+        for index, row in df_location.iterrows():
+            
             location = [row['latitude'], row['longitude']]
-            type_of_aid = row['Aid']  # Get Type of Aid from the dataframe
-            type_of_vehicle = row['Vehicle']  # Get Type of Vehicle from the dataframe
-            count_aid = row['Count'] 
-
+            try :
+                count = row['Count']
+                type_of_aid = row['Aid']  # Get Type of Aid from the dataframe
+                type_of_vehicle = row['Vehicle']  # Get Type of Vehicle from the dataframe
+                count_aid = row['Count'] 
+            except :
+                count = None
+                type_of_aid = None  # Get Type of Aid from the dataframe
+                type_of_vehicle = None  # Get Type of Vehicle from the dataframe
+                count_aid = None
             # Create a custom icon for the marker with the count inside
             custom_icon = folium.DivIcon(
                 icon_size=(30, 30),
@@ -94,11 +101,12 @@ def map():
                     <div style="font-weight: bold;">{count_aid} : عدد المساعدات</div>
                 </div>
             '''
+            location_icon = folium.Icon(color='red', icon='home', prefix='fa')
 
             # Create a marker with a popup containing information
             marker = folium.Marker(
                 location=location,
-                icon=custom_icon,
+                icon=location_icon, # custom_icon
                 popup=folium.Popup(popup_content, max_width=300)  # Popup information
             )
 
