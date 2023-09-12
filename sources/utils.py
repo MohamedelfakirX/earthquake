@@ -1,6 +1,8 @@
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
+from shapely.ops import nearest_points
+from geopy.distance import geodesic
 
 def update_excel(vehicle, aid, location):
     try:
@@ -39,3 +41,20 @@ def update_excel(vehicle, aid, location):
         df = pd.DataFrame(data)
         df.to_excel('earthquake_relief.xlsx', index=False)
 
+def merge_by_distance_coords(df1,df2,distance_threshold_km):
+# Convert the DataFrame to Shapely Point geometries
+    df1['geometry'] = [Point(lon, lat) for lon, lat in zip(df1['Longitude'], df1['Latitude'])]
+    df2['geometry'] = [Point(lon, lat) for lon, lat in zip(df2['Longitude'], df2['Latitude'])]
+
+    merged_data = []
+
+    for index1, row1 in df1.iterrows():
+        for index2, row2 in df2.iterrows():
+            # Calculate the distance between the two points
+            distance = geodesic((row1['Latitude'], row1['Longitude']), (row2['Latitude'], row2['Longitude'])).kilometers
+            if distance <= distance_threshold_km:
+                merged_data.append({**row1, **row2, 'Distance (km)': distance})
+    
+    # Create a new DataFrame from the merged data
+    merged_df = pd.DataFrame(merged_data)
+    return merged_df
