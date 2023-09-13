@@ -61,10 +61,18 @@ def merge_by_distance_coords(df1,df_location,distance_threshold_km):
             # else : 
             #     zero_list = {'Vehicle': None, 'Aid': None, 'Location': row1['Location'], 'Count': 0}
             #     merged_data.append({**zero_list, **row2, 'Distance (km)': distance})
-    
+
     # Create a new DataFrame from the merged data
     merged_df = pd.DataFrame(merged_data)
-    return merged_df
+    rest_df = df_location[~df_location['geometry'].isin(merged_df['geometry'])]
+    rest_df['Aid'] = None
+    rest_df['Vehicle'] = None
+    rest_df['Count'] = 0
+    rest_df['Location'] = rest_df['longitude'].astype(str) + ', ' + rest_df['latitude'].astype(str)
+    rest_df['Distance (km)'] = None
+    rest_df = rest_df[['Vehicle', 'Aid', 'Location', 'Count', 'latitude', 'longitude', 'geometry', 'name', 'Distance (km)']]
+    result = pd.concat([merged_df,rest_df])
+    return merged_df # result
 
 def transform_df(df_merged):
     df_merged['geometry_str'] = df_merged['geometry'].astype(str)
@@ -87,7 +95,7 @@ def transform_df(df_merged):
     location_without_aid['geometry_str'] = location_without_aid['geometry'].astype(str)
     location_without_aid['stats'] = 'No aid'
     location_without_aid = location_without_aid[['geometry_str', 'Aid', 'Vehicle', 'Count', 'stats', 'geometry']]
-    location_without_aid
+    # location_without_aid
     result_df = pd.concat([test_df,location_without_aid])
     return result_df
 

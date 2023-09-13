@@ -30,7 +30,7 @@ def map():
         df_location = pd.read_excel('locations.xlsx')
         # df_location = reduce_location_threshold(df_location,5)
 
-        df_merged = merge_by_distance_coords(df,df_location,5)
+        df_merged = merge_by_distance_coords(df,df_location,3)
         df_merged = transform_df(df_merged)
         def extract_lat_lon(geometry):
             return geometry.y, geometry.x
