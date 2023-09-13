@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from sources.utils import update_excel, merge_by_distance_coords
+from sources.utils import update_excel, merge_by_distance_coords, transform_df, reduce_location_threshold
 import folium
 import pandas as pd
 from folium.plugins import MarkerCluster  # Import MarkerCluster
@@ -28,9 +28,14 @@ def map():
         # Load data from the Excel file
         df = pd.read_excel('earthquake_relief.xlsx')
         df_location = pd.read_excel('locations.xlsx')
+        # df_location = reduce_location_threshold(df_location,5)
 
         df_merged = merge_by_distance_coords(df,df_location,5)
-        df_merged.to_excel('temp_csv.xlsx')
+        df_merged = transform_df(df_merged)
+        def extract_lat_lon(geometry):
+            return geometry.y, geometry.x
+        
+        df_merged['latitude'], df_merged['longitude'] = zip(*df_merged['geometry'].apply(extract_lat_lon))
         # Create a Folium map centered at an initial location
         m = folium.Map(location=[df_merged['latitude'].quantile(0.7), df_merged['longitude'].quantile(0.7)], zoom_start=5)
 
@@ -46,11 +51,12 @@ def map():
                 type_of_aid = row['Aid']  # Get Type of Aid from the dataframe
                 type_of_vehicle = row['Vehicle']  # Get Type of Vehicle from the dataframe
                 count_aid = row['Count'] 
+                stats_aid = row['stats']
+                village_name = row['name']
             except :
                 count = None
                 type_of_aid = None  # Get Type of Aid from the dataframe
                 type_of_vehicle = None  # Get Type of Vehicle from the dataframe
-                count_aid = None
             # Create a custom icon for the marker with the count inside
             custom_icon = folium.DivIcon(
                 icon_size=(30, 30),
@@ -64,8 +70,8 @@ def map():
                     max-width: 300px;  /* Set a maximum width for the popup */
                     text-align: right;  /* right-to-left text direction */
                 ">
-                    <div style="font-weight: bold;">نوع المساعدة : {type_of_aid}</div>
-                    <div style="font-weight: bold;">نوع المركبة : {type_of_vehicle}</div>
+                    <div style="font-weight: bold;">احصائيات عن المساعدات المقدمة : </div>
+                    <div >{stats_aid}</div>
                     <div style="font-weight: bold;">{count_aid} : عدد المساعدات</div>
                 </div>
             '''
